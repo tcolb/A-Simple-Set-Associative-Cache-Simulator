@@ -76,15 +76,6 @@ class WT_SACache(SACache):
         if self.listener is not None:
             self.listener.report(hit)
 
-        """
-        kept this here incase the new implementation doesn't work!
-        if hit:
-            return block[addr - block.startAddress]
-        else:
-            loadedBlock = self._loadBlockContainingAddr(addr)
-            return loadedBlock[addr - loadedBlock.startAddress]
-        """
-
         if not hit:
             block = self._loadBlockContainingAddr(addr)
 
@@ -95,15 +86,6 @@ class WT_SACache(SACache):
 
         if self.listener is not None:
             self.listener.report(False) # always a miss with a wt cache
-            
-        """
-        kept this here incase the new implementation doesn't work!
-        if hit:
-            block[addr - block.startAddress] = value
-        else:
-            block = self._loadBlockContainingAddr(addr)
-            block[addr - block.startAddress] = value
-        """
 
         if not hit:
             block = self._loadBlockContainingAddr(addr)
@@ -126,7 +108,7 @@ class WB_SACache(SACache):
 
         # write back
         if blockLRU.dirty:
-            self.master.writeBlock(addr, blockLRU)
+            self.master.writeBlock(blockLRU.startAddress, blockLRU)
             blockLRU.dirty = False
 
         blockLRU.replaceWith(self.master.readBlock(addr)) # set LRU block to mainmem data

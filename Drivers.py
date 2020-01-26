@@ -1,4 +1,4 @@
-from Cache import WT_SACache
+from Cache import WT_SACache, WB_SACache
 from Memory import HashMemory
 from TraceParser import TraceParser
 from random import randint
@@ -20,7 +20,7 @@ class Listener:
         self.misses = 0
 
 
-class Problem2_Driver:
+class Driver:
 
     randomIntBound = 1000000
 
@@ -37,7 +37,7 @@ class Problem2_Driver:
             self.Parser.close()
         self.Parser = TraceParser(path)
 
-    def initializeCaches(self, setSize):
+    def initializeWTCaches(self, setSize):
         self.setAssoc = setSize
         self.Memory = None
         self.ICache = None
@@ -46,6 +46,18 @@ class Problem2_Driver:
         self.Memory = HashMemory(32)
         self.ICache = WT_SACache(1024, 32, setSize, self.Memory)
         self.DCache = WT_SACache(1024, 32, setSize, self.Memory)
+        self.ICache.listener = self.listener
+        self.DCache.listener = self.listener
+
+    def initializeWBCaches(self, setSize):
+        self.setAssoc = setSize
+        self.Memory = None
+        self.ICache = None
+        self.DCache = None
+        self.Parser = None
+        self.Memory = HashMemory(32)
+        self.ICache = WB_SACache(1024, 32, setSize, self.Memory)
+        self.DCache = WB_SACache(1024, 32, setSize, self.Memory)
         self.ICache.listener = self.listener
         self.DCache.listener = self.listener
 
@@ -66,9 +78,10 @@ class Problem2_Driver:
             if op == 0: # data read
                 self.DCache.read(addr)
             elif op == 1: # data write
-                self.DCache.write(addr, randint(0, Problem2_Driver.randomIntBound))
+                self.DCache.write(addr, randint(0, Driver.randomIntBound))
             elif op == 2: # instruction read
                 self.ICache.read(addr)
+            
             i += 1
         endTime = time()
 
@@ -82,10 +95,19 @@ class Problem2_Driver:
 
         print("Simulation finished")
 
-    def run(self, path):
+    def runWT(self, path):
         i = 1
         while i <= 32:
-            self.initializeCaches(i)
+            self.initializeWTCaches(i)
+            self.initializeParser(path)
+            self.listener.reset()
+            self.simulate()
+            i *= 2
+
+    def runWB(self, path):
+        i = 1
+        while i <= 32:
+            self.initializeWBCaches(i)
             self.initializeParser(path)
             self.listener.reset()
             self.simulate()

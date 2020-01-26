@@ -2,16 +2,15 @@ import TraceParser
 import Cache
 import Drivers
 
-p2 = Drivers.Problem2_Driver()
+prob = Drivers.Driver()
+
+prob.runWT("./traces/cc.trace")
+prob.runWT("./traces/spice.trace")
+prob.runWT("./traces/tex.trace")
+
+prob.runWB("./traces/cc.trace")
+prob.runWB("./traces/spice.trace")
+prob.runWB("./traces/tex.trace")
+
+prob.done()
 """
-p2.initializeCaches(16)
-p2.initializeParser("./traces/cc.trace")
-p2.simulate()
-"""
-p2.run("./traces/cc.trace")
-
-p2.run("./traces/spice.trace")
-
-p2.run("./traces/tex.trace")
-
-p2.done()
